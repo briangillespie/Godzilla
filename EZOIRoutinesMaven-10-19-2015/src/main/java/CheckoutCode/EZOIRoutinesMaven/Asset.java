@@ -8,7 +8,7 @@ public class Asset {
 	private String state;
 	private DateTime checkInDateTime;
 	private DateTime checkOutDateTime;
-	
+
 	public Asset(){
 		assetID=-1;
 		groupID=-1;
@@ -57,5 +57,16 @@ public class Asset {
 		this.checkOutDateTime = checkOutDateTime;
 	}
 
-	
+	public boolean equals(Object anObject){
+		if (anObject instanceof Asset){
+			Asset anAsset = (Asset) anObject;
+			return (assetID == anAsset.getAssetID() &&
+					groupID == anAsset.getGroupID() &&
+					state.equals(anAsset.getState()) &&
+					checkInDateTime.equals(anAsset.getCheckInDateTime()) &&
+					checkOutDateTime.equals(anAsset.getCheckOutDateTime()));
+		}
+		return false;
+
+	}
 }
