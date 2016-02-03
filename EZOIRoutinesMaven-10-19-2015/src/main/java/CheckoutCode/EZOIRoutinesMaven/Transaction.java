@@ -114,14 +114,14 @@ public class Transaction {
 	}
 	
 	public DateTime getCheckOutDateTime(){
-		String checkOutDateTimeStr=created_at;
-		DateTime checkOutDateTime=FORMAT.parseDateTime(checkOutDateTimeStr);
+		String checkOutDateTimeStr = created_at;
+		DateTime checkOutDateTime = FORMAT.parseDateTime(checkOutDateTimeStr);
 		return checkOutDateTime;
 	}
 	
 	public DateTime getCheckInDateTime(){
-		String checkInDateTimeStr=checkin_on;
-		DateTime checkInDateTime=FORMAT.parseDateTime(checkInDateTimeStr);
+		String checkInDateTimeStr = checkin_on;
+		DateTime checkInDateTime = FORMAT.parseDateTime(checkInDateTimeStr);
 		return checkInDateTime;
 	}
 	

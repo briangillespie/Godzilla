@@ -54,7 +54,7 @@ public class AssetTest extends TestCase {
 		checkedOutAsset.setGroupID(STD_GROUP_ID);
 		checkedOutAsset.setState(CHECKED_OUT);
 		checkedOutAsset.setCheckInDateTime(FORMAT.parseDateTime("2016-01-01 12:00:00"));
-		checkedOutAsset.setCheckOutDateTime(FORMAT.parseDateTime("2016-01-01 12:00:00"));
+		checkedOutAsset.setCheckOutDateTime(FORMAT.parseDateTime("2016-01-01 12:01:00"));
 
 	}
 
