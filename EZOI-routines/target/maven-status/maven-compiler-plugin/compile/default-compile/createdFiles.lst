@@ -1,0 +1,7 @@
+com\gillespie\EZOI_routines\Transaction.class
+com\gillespie\EZOI_routines\Constants.class
+com\gillespie\EZOI_routines\App.class
+com\gillespie\EZOI_routines\RestrictCheckIn.class
+com\gillespie\EZOI_routines\PenalizeLateCheckIns.class
+com\gillespie\EZOI_routines\APIRequestHandler.class
+com\gillespie\EZOI_routines\Asset.class
