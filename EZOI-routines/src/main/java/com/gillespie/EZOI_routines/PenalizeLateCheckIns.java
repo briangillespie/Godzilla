@@ -34,9 +34,12 @@ public class PenalizeLateCheckIns {
   public static void main(String[] args) throws Exception {
     PenalizeLateCheckIns p = new PenalizeLateCheckIns();
     p.penalizeLateCheckInAssets();
-
-    // ArrayList<Transaction> transactionsOfTheDay = p.getTransactionsOfTheDay(3);
-    // int test = p.getPendingFee(56587);
+//    RestrictCheckIn restrict = new RestrictCheckIn();
+//    ArrayList<Integer> allAssetIDs = restrict.getAllActiveAssetIDs();
+//    ArrayList<Transaction> transactionsOfTheDay = new ArrayList<Transaction>();
+//    Transaction t = p.getTransactionsOfTheDay(13).get(0);
+//    System.out.println(t);
+//    p.sendLateEmail(t);
   }
 
   public void penalizeLateCheckInAssets() throws Exception {
@@ -52,8 +55,10 @@ public class PenalizeLateCheckIns {
       // being dealt separately because of date conflict
       if (isAssetBeingHeld(assetID)) {
         Transaction thisTransaction = getLatestTransaction(assetID);
-        sendLateEmail(thisTransaction);
-        revokeUserLoginAndUpdateNotes(thisTransaction.getStudentID());
+        System.out.print("Asset being held: ");
+        System.out.println(thisTransaction);
+//        sendLateEmail(thisTransaction);
+//        revokeUserLoginAndUpdateNotes(thisTransaction.getStudentID());
       }
 
       for (int j = 0; j < numberOfTransactions; j++) {
@@ -78,8 +83,10 @@ public class PenalizeLateCheckIns {
           }
 
           if (studentCheckInDateTime.compareTo(checkInDateTime) == 1) {
-            sendLateEmail(thisTransaction);
-            revokeUserLoginAndUpdateNotes(thisTransaction.getStudentID());
+            System.out.print("Checked out item: ");
+            System.out.println(thisTransaction);
+//            sendLateEmail(thisTransaction);
+//            revokeUserLoginAndUpdateNotes(thisTransaction.getStudentID());
           }
         }
       }
@@ -121,6 +128,7 @@ public class PenalizeLateCheckIns {
     in.close();
 
     ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     String arrayResponse = response.substring(11);
     CollectionType constructCollectionType =
         TypeFactory.defaultInstance().constructCollectionType(ArrayList.class, Transaction.class);
@@ -180,32 +188,30 @@ public class PenalizeLateCheckIns {
       }
       in.close();
 
+      DateTime assetActiveDateTime = new DateTime().minusDays(1);
+//      System.out.println(assetActiveDateTime);
+      int day = assetActiveDateTime.getDayOfMonth();
+      int month = assetActiveDateTime.getMonthOfYear();
+      int year = assetActiveDateTime.getYear();
       ObjectMapper mapper = new ObjectMapper();
-      String emptyHistory = "{\"history\":[]}";
-      if (!response.equals(emptyHistory)) {
+      mapper.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      String emptyHistory = "{\"history\":[]";
+      if (!response.substring(0,13).equals(emptyHistory)) {
         String arrayResponse = response.substring(11, response.length() - 1);
         CollectionType constructCollectionType =
-            TypeFactory.defaultInstance().constructCollectionType(ArrayList.class,
-                Transaction.class);
+                TypeFactory.defaultInstance().constructCollectionType(ArrayList.class,
+                        Transaction.class);
         currentTransactions = mapper.readValue(arrayResponse, constructCollectionType);
-        allTransactions.addAll(currentTransactions);
-        DateTime currentDateTime = new DateTime();
-
-        DateTime assetActiveDateTime = currentDateTime.minusDays(1);
-        // DateTime assetActiveDateTime = currentDateTime;
-        int day = assetActiveDateTime.getDayOfMonth();
-        int month = assetActiveDateTime.getMonthOfYear();
-        int year = assetActiveDateTime.getYear();
-
-        DateTime lastTransactionDateTime = currentTransactions.get(4).getCheckOutDateTime();
-        int lastTransactionDay = lastTransactionDateTime.getDayOfMonth();
-        int lastTransactionMonth = lastTransactionDateTime.getMonthOfYear();
-        int lastTransactionYear = lastTransactionDateTime.getYear();
-
-        if (!(day == lastTransactionDay && month == lastTransactionMonth && year == lastTransactionYear)) {
-          removePreviousDayTransactions(allTransactions, day, month, year);
-          return allTransactions;
+        for (Transaction t : currentTransactions){
+          DateTime checkoutDateTime = t.getCheckOutDateTime();
+          if (day == checkoutDateTime.getDayOfMonth() &&
+                  month == checkoutDateTime.getMonthOfYear() &&
+                  year == checkoutDateTime.getYear()) {
+            allTransactions.add(t);
+          }
         }
+//        System.out.println(allTransactions);
+        currentTransactions.clear();
       } else {
         break;
       }
@@ -213,6 +219,72 @@ public class PenalizeLateCheckIns {
     }
     return allTransactions;
   }
+//  private ArrayList<Transaction> getTransactionsOfTheDay(int assetID) throws Exception {
+//    int i = 1;
+//    ArrayList<Transaction> currentTransactions = new ArrayList<Transaction>();
+//    ArrayList<Transaction> allTransactions = new ArrayList<Transaction>();
+//
+//    while (true) {
+//      String url = MASTER_URL + ASSETS + assetID + "/history_paginate.api?page=" + i;
+//
+//      URL obj = new URL(url);
+//      HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+//      // request method
+//      con.setRequestMethod("GET");
+//
+//      // request headers
+//      con.setRequestProperty("token", USER_TOKEN);
+//      con.setRequestProperty("User-Agent", USER_AGENT);
+//
+//      // reading input stream
+//      BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+//      String inputLine;
+//      String response = "";
+//      while ((inputLine = in.readLine()) != null) {
+//        response += inputLine;
+//      }
+//      in.close();
+//
+//      ObjectMapper mapper = new ObjectMapper();
+//      mapper.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//      String emptyHistory = "{\"history\":[]}";
+//      if (!response.equals(emptyHistory)) {
+//        String arrayResponse = response.substring(11, response.length() - 1);
+//        CollectionType constructCollectionType =
+//            TypeFactory.defaultInstance().constructCollectionType(ArrayList.class,
+//                Transaction.class);
+//        currentTransactions = mapper.readValue(arrayResponse, constructCollectionType);
+////        for (Transaction t : currentTransactions){
+////          System.out.println(t.toString());
+////        }
+//        allTransactions.addAll(currentTransactions);
+//        System.out.println(allTransactions);
+//        DateTime currentDateTime = new DateTime();
+//
+//        DateTime assetActiveDateTime = currentDateTime.minusDays(1);
+//        // DateTime assetActiveDateTime = currentDateTime;
+//        int day = assetActiveDateTime.getDayOfMonth();
+//        int month = assetActiveDateTime.getMonthOfYear();
+//        int year = assetActiveDateTime.getYear();
+//
+//        DateTime lastTransactionDateTime = currentTransactions.get(4).getCheckOutDateTime();
+//        System.out.println(lastTransactionDateTime);
+//        int lastTransactionDay = lastTransactionDateTime.getDayOfMonth();
+//        int lastTransactionMonth = lastTransactionDateTime.getMonthOfYear();
+//        int lastTransactionYear = lastTransactionDateTime.getYear();
+//        System.out.println(allTransactions);
+//        if (!(day == lastTransactionDay && month == lastTransactionMonth && year == lastTransactionYear)) {
+//          removePreviousDayTransactions(allTransactions, day, month, year);
+//          System.out.println(allTransactions);
+//          return allTransactions;
+//        }
+//      } else {
+//        break;
+//      }
+//      i++;
+//    }
+//    return allTransactions;
+//  }
 
   private void removePreviousDayTransactions(ArrayList<Transaction> allTransactions, int day,
       int month, int year) {
@@ -328,7 +400,19 @@ public class PenalizeLateCheckIns {
     return Integer.parseInt(description);
   }
 
-  private void sendLateEmail(Transaction thisTransaction) {
-
-  }
+//  private void sendLateEmail(Transaction thisTransaction) {
+//    long studentID = thisTransaction.getStudentID();
+//    String studentEmail;
+//    APIRequestHandler req = new APIRequestHandler();
+//    try {
+////      studentEmail = req.getAPIResponse("https://northeasternuniversitysea.ezofficeinventory.com/members/" + studentID + ".api");
+//      studentEmail = thisTransaction.getStudentEmail();
+//      System.out.println(studentEmail);
+//      LateFeeEmailer lfe = new LateFeeEmailer();
+//      lfe.sendMail(studentEmail);
+//    }catch(Exception e){
+//      e.printStackTrace();
+//      System.out.println("Unable to send email to " + studentID);
+//    }
+//  }
 }

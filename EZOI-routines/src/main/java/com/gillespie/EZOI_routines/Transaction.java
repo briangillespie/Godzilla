@@ -3,6 +3,10 @@ package com.gillespie.EZOI_routines;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.omg.IOP.ExceptionDetailMessage;
 
 public class Transaction {
 
@@ -180,4 +184,36 @@ public class Transaction {
     return checkInDateTime;
   }
 
+  public String toString(){
+    return this.id + " " + this.assigned_asset + " " + this.assigned_to_id + " " + this.checkin_on;
+  }
+
+  protected String getStudentEmail(){
+    long studentID = this.getStudentID();
+    APIRequestHandler req = new APIRequestHandler();
+    String response = null;
+    try{
+      response = req.getAPIResponse("https://northeasternuniversitysea.ezofficeinventory.com/members/" + studentID + ".api");
+      JsonFactory jsonFactory = new JsonFactory();
+      JsonParser parser = jsonFactory.createJsonParser(response);
+
+      while (parser.nextToken() != JsonToken.END_ARRAY) {
+        String token = parser.getText();
+        if (Constants.EMAIL.equals(token)) {
+//          parser.nextToken();
+          return parser.nextTextValue();
+        }
+      }
+    }
+    catch(Exception e){
+      e.printStackTrace();
+      System.out.println("Bad response from API, or otherwise unparseable response.");
+    }
+    finally{
+      if(response == null){
+        System.out.println("Unable to find email address for Student: " + studentID);
+      }
+    }
+  return response;
+  }
 }

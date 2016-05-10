@@ -39,7 +39,7 @@ public class RestrictCheckIn {
 	}
 
 	public RestrictCheckIn(){
-		this.handler = null;
+		this.handler = new APIRequestHandler();
 	}
 
 	public void setAPIRequestHandler(APIRequestHandler handler){
@@ -165,7 +165,7 @@ public class RestrictCheckIn {
 		ArrayList<Integer> allAssetIDs = new ArrayList<Integer>();
 		for (int i = 1; i <= PAGES; i++) {
 			String url = "https://northeasternuniversitysea.ezofficeinventory.com/assets.api?page=" + i;
-			String response = handler.getAPIResponse(url);			
+			String response = handler.getAPIResponse(url);
 			allAssetIDs.addAll(this.getActiveAssetsFromPage(response));
 		}
 		return allAssetIDs;

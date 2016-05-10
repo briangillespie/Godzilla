@@ -25,4 +25,5 @@ public class Constants {
   public static final String CHECKOUT_ON = "checkout_on";
   public static final String ASSET_ID = "asset_id";
   public static final int FAC_STAFF_GROUPID = 32954;
+  public static final String EMAIL = "email";
 }
